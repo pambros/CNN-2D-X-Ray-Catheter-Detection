@@ -10,16 +10,16 @@ from File import *
 from Util import *
 from UtilImage import *
 
-NB_GENERATED_SEQUENCES = 50
-
-FORMAT_CONFIG = "{0:04d}"
+NB_GENERATED_SEQUENCES = 20
 
 SIZE_X = 1024
 SIZE_Y = 1024
 
 NB_FRAMES = 4
 
-NB_PTS = 500
+NB_PTS = 800
+
+FORMAT_CONFIG = "{0:04d}"
 
 def CreateFakeFluoroscopy(_x, _y):
 	SMALL_POSITIVE_NUMBER = 0.000001

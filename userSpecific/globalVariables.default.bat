@@ -25,7 +25,7 @@
 
 @set _LIBS_DIR=C:/Libs
 
-@set _BOOST_SRC_DIR=%_LIBS_DIR%/boost/
+@set _BOOST_SRC_DIR=%_LIBS_DIR%/boost
 @set _BOOST_LIB_DIR=%_LIBS_DIR%/boost_build/lib
 
 @set _LIB_GPU_ARRAY_DIR=%_LIBS_DIR%/libGpuArray

@@ -175,6 +175,9 @@ def SaveDicomSequence(_filename, _sequence):
 
 	# print("Writing test file as Big Endian Explicit VR", filename2)
 	# ds.save_as(filename2)
+
+def LoadImage(_path):
+	return ski.io.imread(_path)
 	
 def SaveImage(_path, _buffer):
 	# with warnings.catch_warnings():
@@ -182,6 +185,25 @@ def SaveImage(_path, _buffer):
 		# ski.io.imsave(_path, _buffer)
 	ski.io.imsave(_path, _buffer)
 
+def StackImagesMultiChan(_imgs, _columns, _rows):
+	Xid = 2
+	Yid = 3
+	bigImage = np.zeros((_imgs.shape[1], _rows*_imgs.shape[Yid], _columns*_imgs.shape[Xid]), dtype=_imgs.dtype)
+	# for index, img in enumerate(_imgs):
+	for index in range(_columns*_rows):
+		if index >= len(_imgs):
+			break
+		i = int(index/_columns)
+		j = index%_columns
+		for chan in range(_imgs.shape[1]):
+			bigImage[chan, i*_imgs.shape[Yid]:(i+1)*_imgs.shape[Yid], j*_imgs.shape[Xid]:(j+1)*_imgs.shape[Xid]] = _imgs[index][chan][...]
+	return bigImage
+
+def SaveSetImagesMultiChan(_path, _imgs, _columns, _rows, _compressed = False):
+	image = StackImagesMultiChan(_imgs, _columns, _rows)
+	image = np.moveaxis(image, 0, -1)
+	SaveImage(_path, (image*255).astype(np.uint8))
+	
 def GrayToRGB(_image):
 	image = np.empty((3, _image.shape[0], _image.shape[1]))
 	image[0][...] = _image[...]
@@ -197,6 +219,22 @@ def PadImage(_image, _newImageSizeX, _newImageSizeY):
 	padY = (_newImageSizeY - _image.shape[0])//2
 	padImage = ski.util.pad(_image, ((padY, padY),(padX, padX)), 'constant', constant_values=0) 
 	return padImage, padX, padY
+
+def ResizeImage(_image, _factor):
+	return ski.transform.resize(_image, (_image.shape[0]*_factor, _image.shape[1]*_factor), order = 3, preserve_range=True)
+
+def ResizeImageMultiChan(_image, _factor):
+	# print(_image.shape)
+	_image = np.rollaxis(_image, 2, 0)
+	newImage = np.empty([_image.shape[0], (int)(_image.shape[1]*_factor), (int)(_image.shape[2]*_factor)], dtype = _image.dtype)
+	for i in range(_image.shape[0]):
+		image = ski.transform.resize(_image[i], (_image.shape[1]*_factor, _image.shape[2]*_factor), order = 3, preserve_range=True)
+		# newImage[i] = image.astype(np.float32)
+		newImage[i] = image
+	newImage = np.rollaxis(newImage, 0, 3)
+	print(newImage.shape)
+	print(newImage.dtype)
+	return newImage
 
 def PtsListToMask(_imageSizeX, _imageSizeY, _ptsList, _dilationStructure = (2,2)):
 	coordinates = np.swapaxes(_ptsList, 0, 1)

@@ -501,7 +501,8 @@ void Tree::MergeAndRemoveGaps(void){
 				if(Q_TRUE){
 					//if(branch->GetNeighborsNbAtCrossingPt(connectedPt) == 1){ // comment it because not sure if it is useful at some point?
 					if(Q_TRUE){
-						if(branch->m_Ptl.size() > branch2->m_Ptl.size() && branch2->m_Ptl.size() > m_Parameters->m_LoopSizeMin){
+						if(branch->m_Ptl.size() > branch2->m_Ptl.size() && branch2->m_Ptl.size() > m_Parameters->m_LoopSizeMin
+						&& connectedPt < branch->m_Ptl.size() - 1){
 							Branch *branch3 = branch->Divide(connectedPt + 1, static_cast<Branch::IdType>(branch->m_Ptl.size() - 1));
 							Branch::IdType connectedPt3 = 0;
 

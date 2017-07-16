@@ -97,14 +97,10 @@ if(MAKE_PYTHON_WRAPPER)
 	if(PYTHON_DEBUG_OUTPUT)
 		add_definitions(-DPYTHON_DEBUG_OUTPUT)
 	endif(PYTHON_DEBUG_OUTPUT)
-	
-	set(PYTHON_WRAPPER_THIRD_PARTY_SOURCES)
 
 	add_library(
 		PyTACELib SHARED
 		src/PyTACELib/PythonWrapper.cpp
-		
-		${PYTHON_WRAPPER_THIRD_PARTY_SOURCES}
 	)
 	
 	target_link_libraries(

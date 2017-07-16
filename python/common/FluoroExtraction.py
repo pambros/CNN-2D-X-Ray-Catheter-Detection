@@ -6,9 +6,7 @@ from skimage.morphology import skeletonize
 from Util import *
 from FluoroDataObject import *
 
-if True:
-# if False:
-	from NnetsX import *
+from NnetsX import *
 
 import PyTACELib
 
@@ -33,6 +31,7 @@ def GetCenterline(_image, _imgInfo = None):
 	image = skeletonize(image)
 	# print("image.dtype " + str(image.dtype))
 	image = (image*255).astype(np.uint8)
+	# SaveImage("generated/debug.png", image)
 	if PYTACELIB_DEBUG_OUTPUT == True:
 		centerline, debugStepList = PyTACELib.ExtractCenterline(image)
 	else:
@@ -60,7 +59,7 @@ def GetCenterline(_image, _imgInfo = None):
 	return centerline
 
 class FluoroExtraction(object):
-	def __init__(_self, _weightsFile):
+	def __init__(_self, _weightsFile=None):
 		optimizer = SGD(lr=0.01, decay=5e-4, momentum=0.99)
 		nnets = NNets()
 		nnets.m_SamePartActivation = MyReLU
@@ -72,7 +71,7 @@ class FluoroExtraction(object):
 		nnets.m_Initialization = "glorot_uniform"
 		nnets.m_DownSampling = DOWNSAMPLING_STRIDED_CONV
 		nnets.m_UpSampling = UPSAMPLING_UPSAMPLE
-		nbUsedChannel = 4
+		nbUsedChannel = NB_CHANNEL
 		nbStartFilter = 8
 		kernelSize = 3
 		nbConvPerLayer = [2, 2, 2, 2, 2, 2, 2]
@@ -84,18 +83,12 @@ class FluoroExtraction(object):
 		print(len(_self.m_Model.layers))
 		# _self.m_Model.summary()
 		
-		if True:
-		# if False:
+		if _weightsFile is not None:
 			_self.m_Model.load_weights(_weightsFile)
-			
-		_self.m_X = np.empty([1, NB_CHANNEL, SIZE_Y, SIZE_X], dtype=np.float32)
 
 	def ExtractCenterline(_self, _images, _imgInfo = None):
-		for i in range(NB_CHANNEL):
-			_self.m_X[0, i][...] = _images[i]
-		
 		t0 = time.time()
-		Y = _self.m_Model.predict(_self.m_X, batch_size=1)
+		Y = _self.m_Model.predict(_images, batch_size=1)
 		print("_self.m_Model.predict " + str(time.time() - t0) + " s")
 		
 		if PYTACELIB_DEBUG_OUTPUT == True:
