@@ -1,4 +1,4 @@
-# Catheter Segmentation in X-Ray Fluoroscopy using convolutional neural networks
+# Catheter segmentation in X-Ray fluoroscopy using convolutional neural networks
 
 This code is the implementation of the method presented in the following paper:
 	
@@ -9,6 +9,9 @@ arXiv preprint [![](docs/images/pdf.png)][2017AmbrosiniPreprint]
 [2017AmbrosiniPreprint]: https://www.miccai2017.org/
 
 ![](docs/images/catheterExtractionExample2.png)
+
+## Neural network architecture
+
 ![](docs/images/diagramCNN.png)
 
 ## Prerequisites
