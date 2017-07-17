@@ -3,12 +3,13 @@
 This code is the implementation of the method presented in the following paper:
 	
 - P. Ambrosini, D. Ruijters, W.J. Niessen, A. Moelker and T. van Walsum: [Fully Automatic and Real-Time Catheter Segmentation in X-Ray Fluoroscopy][2017Ambrosini]. The 20th International Conference on Medical Image Computing and Computer Assisted Intervention (MICCAI), Lecture Notes in Computer Science, vol. xxxx, pp. xxx-xxx, 2017.
-ArXiv preprint [![](docs/images/pdf.png)][2017AmbrosiniPreprint]
+arXiv preprint [![](docs/images/pdf.png)][2017AmbrosiniPreprint]
 
 [2017Ambrosini]: https://www.miccai2017.org/
 [2017AmbrosiniPreprint]: https://www.miccai2017.org/
 
-![](docs/images/catheterExtractionExample.png)
+![](docs/images/catheterExtractionExample2.png)
+![](docs/images/diagramCNN.png)
 
 ## Prerequisites
 
@@ -74,3 +75,5 @@ TestCatheterSegmentation.bat
 ````
 
 In the folder `generated`, you should have 3 images for all the last images of the 20 sequences: the normal one, the output of the neural network and the overlay of the extracted centerline. On some images, we can see that the extraction method does not work when the catheter shape is a bit more complex even if the output of the neural network is quite ok. Hopefully these kind of shapes should be limited in real 2D catheterization X-ray fluoroscopies.
+
+![](docs/images/catheterExtractionExample.png)
