@@ -6,7 +6,7 @@ This code is the implementation of the method presented in the following paper:
 arXiv preprint [![](docs/images/pdf.png)][2017AmbrosiniPreprint]
 
 [2017Ambrosini]: https://www.miccai2017.org/
-[2017AmbrosiniPreprint]: https://www.miccai2017.org/
+[2017AmbrosiniPreprint]: https://arxiv.org/abs/1707.05137
 
 ![](docs/images/catheterExtractionExample2.png)
 
