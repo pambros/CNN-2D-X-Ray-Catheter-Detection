@@ -18,7 +18,9 @@ arXiv preprint [![](docs/images/pdf.png)][2017AmbrosiniPreprint]
 
 Tested on:
 
-- Windows 10 64bits with Python 3.6.1 and Microsoft Visual C++ 14.00 2015 update 3 express version
+- Windows 10 64bits with Python 3.6.1 and:
+	- Microsoft Visual C++ 14.00 2015 update 3 express version
+	- Microsoft Visual C++ 12.00 2013 update 5 express version
 
 To build the C++ code you need:
 
@@ -45,7 +47,7 @@ To see if everything went fine, check the files `cpp/generated/stderrbuildConfig
 You can also launch the debug python test.
 
 ```batch
-cd ../tests
+cd ../tests/debugCppExtractCenterlineRedirect
 DebugCppExtractCenterlineRedirect.bat
 ````
 
@@ -55,7 +57,7 @@ Now you can execute the training/testing example. We do not provide 2D X-ray dat
 Execute the `generateTrainTestDataset` python code to create 20 dicom sequences (4 frames per sequence) with their associated centerline txt files.
 
 ```batch
-cd ../examples/generateTrainTestDataset
+cd ../../examples/generateTrainTestDataset
 GenerateTrainTestDatasetRedirect.bat
 ````
 
@@ -64,7 +66,7 @@ You should have in the `generated` folder all the dicom sequences (`sequenceXXXX
 We then train the neural network with the 10 first sequences and evaluate them with the 10 last sequences during 300 epochs.
 
 ```batch
-cd ../examples/trainCatheterSegmentationRedirect
+cd ../trainCatheterSegmentationRedirect
 TrainCatheterSegmentationRedirect.bat
 ````
 
@@ -73,7 +75,7 @@ The training lasts about ~25 min. The last output of Keras is something like thi
 Finally after the training, we test the full catheter/guidewire extraction method (neural network, skeletonization and spline extraction).
 
 ```batch
-cd ../examples/testCatheterSegmentation
+cd ../testCatheterSegmentation
 TestCatheterSegmentation.bat
 ````
 

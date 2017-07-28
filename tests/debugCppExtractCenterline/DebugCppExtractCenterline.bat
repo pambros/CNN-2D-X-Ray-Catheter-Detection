@@ -1,4 +1,4 @@
-@call ../localProjectPath.bat
+@call ../../localProjectPath.bat
 @call "%_PROJECT_PATH%/globalVariables.bat"
 @set _PYTHON_FILE=%~n0
 @set _PWD=%CD%

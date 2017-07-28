@@ -39,7 +39,7 @@
 #endif
 
 #ifndef DEBUG
-	 #ifdef _DEBUG
+	#if defined(_DEBUG) || defined(Q_DEBUG)
 		#define DEBUG
 	#endif
 #endif
@@ -104,6 +104,10 @@ void operator delete[](void *_p);
 		} \
 	}
 
+	
+#define qMemcpy(...) memcpy(__VA_ARGS__)
+#define qMemset(...) memset(__VA_ARGS__)
+	
 #ifdef _MSC_VER
 	#define qSprintf(_buffer, _sizeBuffer, _format, ...) sprintf_s(_buffer, _sizeBuffer, _format, __VA_ARGS__)
 	#define qVsnprintf(_buffer, _sizeBuffer, _format, ...) vsnprintf_s(_buffer, _sizeBuffer, _sizeBuffer - 1, _format, __VA_ARGS__)

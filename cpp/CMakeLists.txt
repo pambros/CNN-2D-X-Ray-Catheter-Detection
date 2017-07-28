@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 
 project(TACE)
 
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DQ_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DQ_DEBUG")
+
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BUILD_TYPE})
 
 set(TACELIB_PATH "")
@@ -109,6 +112,17 @@ if(MAKE_PYTHON_WRAPPER)
 		${PYTHON_LIBRARIES}
 		TACELib
 	)
+	
+	if(ADDITIONAL_LIBRARIES_DEBUG)
+		# message(${ADDITIONAL_LIBRARIES_DEBUG}) # print with no delimiter
+		# message("${ADDITIONAL_LIBRARIES_DEBUG}") # print whith ";" delimiter
+		# list(LENGTH ADDITIONAL_LIBRARIES_DEBUG ADDITIONAL_LIBRARIES_DEBUG_LEN)
+		# message(${ADDITIONAL_LIBRARIES_DEBUG_LEN})
+		target_link_libraries(PyTACELib debug ${ADDITIONAL_LIBRARIES_DEBUG} ${ADDITIONAL_LIBRARIES})
+	endif()
+	if(ADDITIONAL_LIBRARIES_RELEASE)
+		target_link_libraries(PyTACELib optimized ${ADDITIONAL_LIBRARIES_RELEASE} ${ADDITIONAL_LIBRARIES})
+	endif()
 	
 	# don't prepend wrapper library name with lib
 	set_target_properties(PyTACELib PROPERTIES SUFFIX ".pyd" IMPORT_PREFIX "" PREFIX "")

@@ -255,6 +255,15 @@ def VectorToFileF(_f, _vec, _split = " "):
 	_f.write("\n")
 	return
 
+def FileToMatrix(_f):
+	mat = IdentityMatrix44()
+	for i in range(0, 4):
+		line = ReadLine(_f)
+		list = line.split()
+		for j in range(0, 4):
+			mat[i][j] = float(list[j])
+	return mat
+
 def MatrixToFile(_f, _mat):
 	for i in range(0, 4):
 		for j in range(0, 4):

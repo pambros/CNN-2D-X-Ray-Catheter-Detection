@@ -25,13 +25,18 @@
 		@mkdir "debug"
 	)
 	@cd debug
-	%_CMAKE% -G %_COMPILER_NAME% "../../" -DCMAKE_BUILD_TYPE="Debug" %_OPTIONS%
+	
+	%_CMAKE% -G %_COMPILER_NAME% "../../../" -DCMAKE_BUILD_TYPE="Debug" %_OPTIONS%
+	
 	@cd ..
+	
 	@if not exist release (
 		@mkdir "release"
 	)
+	
 	@cd release
-	%_CMAKE% -G %_COMPILER_NAME% "../../" -DCMAKE_BUILD_TYPE="Release" %_OPTIONS%
+	
+	%_CMAKE% -G %_COMPILER_NAME% "../../../" -DCMAKE_BUILD_TYPE="Release" %_OPTIONS%
 )
 
 @if "%1" neq "-nopause" (

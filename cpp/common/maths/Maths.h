@@ -1,6 +1,9 @@
 #ifndef __UTIL_MATHS_HEADER_
 #define __UTIL_MATHS_HEADER_
 #include <math.h>
+#if defined(__GNUC__)
+	#include <cmath>
+#endif
 
 #include "common/util/Util.h"
 
