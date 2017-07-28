@@ -21,6 +21,7 @@ Tested on:
 - Windows 10 64bits with Python 3.6.1 and:
 	- Microsoft Visual C++ 14.00 2015 update 3 express version
 	- Microsoft Visual C++ 12.00 2013 update 5 express version
+	- MinGW-w64 and GCC 5.4.0
 
 To build the C++ code you need:
 
