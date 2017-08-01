@@ -105,8 +105,8 @@ void operator delete[](void *_p);
 	}
 
 	
-#define qMemcpy(...) memcpy(__VA_ARGS__)
-#define qMemset(...) memset(__VA_ARGS__)
+#define qMemcpy(_dst, _src, _size) memcpy(_dst, _src, _size)
+#define qMemset(_dst, _val, _size) memset(_dst, _val, _size)
 	
 #ifdef _MSC_VER
 	#define qSprintf(_buffer, _sizeBuffer, _format, ...) sprintf_s(_buffer, _sizeBuffer, _format, __VA_ARGS__)

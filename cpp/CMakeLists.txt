@@ -29,10 +29,10 @@ if(USE_ITK)
 	add_definitions(-DUSE_ITK)
 endif(USE_ITK)
 
-set(TACE_SOURCES)
+set(TACE_SPECIFIC_SOURCES)
 if(USE_ITK)
 	add_definitions(-DNEED_FILE)
-	list(APPEND TACE_SOURCES
+	list(APPEND TACE_SPECIFIC_SOURCES
 	${TACELIB_PATH}common/util/File.cpp
 	${TACELIB_PATH}common/util/File.h)
 endif(USE_ITK)
@@ -57,7 +57,7 @@ add_library(
 	${TACELIB_PATH}common/util/Util.cpp
 	${TACELIB_PATH}common/util/Util.h
 	
-	${TACE_SOURCES}
+	${TACE_SPECIFIC_SOURCES}
 )
 
 # set_target_properties(TACELib PROPERTIES COMPILE_FLAGS "-DQ_STATIC=1")

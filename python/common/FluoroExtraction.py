@@ -22,7 +22,6 @@ SIZE_Y = 1024
 NB_CHANNEL = 4
 
 def GetCenterline(_image, _imgInfo = None):
-	# image = np.copy(_image)
 	image = _image
 	image[image > THRESHOLD_BINARY] = 1
 	image[image <= THRESHOLD_BINARY] = 0
@@ -96,7 +95,7 @@ class FluoroExtraction(object):
 		else:
 			centerline = GetCenterline(Y[0, 0], _imgInfo)
 		print("ExtractCenterline " + str(time.time() - t0) + " s")
-		print("Y.shape " + str(Y.shape))
+		print("Y.shape " + str(Y.shape) + " Y.dtype " + str(Y.dtype) + " min(Y) " + str(np.min(Y)) + " max(Y) " + str(np.max(Y)))
 		print("len(centerline) " + str(len(centerline)))
 
 		return centerline, Y

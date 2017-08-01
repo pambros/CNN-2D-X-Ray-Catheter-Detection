@@ -76,7 +76,8 @@ if gZipLoaded == True:
 			projectsFS = _self.m_ZipFileList.get(_zipfile)
 			if projectsFS == None:
 				print("ZipFileManager::GetZipFile " + str(_zipfile))
-				projectsFS = ZipFS(_zipfile, mode = 'r')
+				# projectsFS = ZipFS(_zipfile, mode = 'r')
+				projectsFS = ZipFS(_zipfile)
 				_self.m_ZipFileList[_zipfile] = projectsFS
 			return projectsFS
 			
@@ -308,4 +309,5 @@ def PtsListFromFile(_fileName):
 			CloseFile(f)
 	else:
 		print("PtsListFromFile() Warning " + str(_fileName) + " doesn't exist")
+		assert(False)
 	return ptsList

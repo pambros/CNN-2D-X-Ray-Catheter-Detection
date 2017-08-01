@@ -236,6 +236,29 @@ def ResizeImageMultiChan(_image, _factor):
 	print(newImage.dtype)
 	return newImage
 
+def DrawLine(_image, _x1, _y1, _x2, _y2, _color):
+	# vertical line
+	if _x1 == _x2:
+		for i in range(_y1, _y2 + 1):
+			_image[0][i][_x1] = _color[0]
+			_image[1][i][_x1] = _color[1]
+			_image[2][i][_x1] = _color[2]
+	# horizontal line
+	elif _y1 == _y2:
+		for i in range(_x1, _x2 + 1):
+			_image[0][_y1][i] = _color[0]
+			_image[1][_y1][i] = _color[1]
+			_image[2][_y1][i] = _color[2]
+	else:
+		# TODO
+		assert(False)
+
+def DrawRect(_image, _x1, _y1, _x2, _y2, _color):
+	DrawLine(_image, _x1, _y1, _x1, _y2, _color)
+	DrawLine(_image, _x2, _y1, _x2, _y2, _color)
+	DrawLine(_image, _x1, _y1, _x2, _y1, _color)
+	DrawLine(_image, _x1, _y2, _x2, _y2, _color)
+
 def PtsListToMask(_imageSizeX, _imageSizeY, _ptsList, _dilationStructure = (2,2)):
 	coordinates = np.swapaxes(_ptsList, 0, 1)
 	# print(coordinates.shape)

@@ -27,7 +27,7 @@ public:
 	typedef std::multimap<IdType, Branch*> Neighbors;
 
 	Branch(PtList _ptl) : m_Ptl(_ptl){
-		memset(m_Info, 0, INFO_COUNT*sizeof(m_Info[0]));
+		qMemset(m_Info, 0, INFO_COUNT*sizeof(m_Info[0]));
 		for(qsize_t i = 0; i < FLAG_COUNT; ++i){
 			m_Flag[i] = Q_FALSE;
 		}

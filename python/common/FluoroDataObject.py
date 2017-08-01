@@ -26,6 +26,12 @@ INFO_DIAPHRAGM_Y1 = 6
 INFO_DIAPHRAGM_Y2 = 7
 INFO_COUNT = 8
 
+def GetFloat32NormalizedFrameWithoutBorders(_image, _bitDepth, _normalize, _imgInfo):
+	image = _image[_imgInfo[INFO_DIAPHRAGM_Y1]:_imgInfo[INFO_DIAPHRAGM_Y2] + 1, _imgInfo[INFO_DIAPHRAGM_X1]:_imgInfo[INFO_DIAPHRAGM_X2] + 1]
+	image = GetFloat32NormalizedFrame(image, _bitDepth, _normalize)
+	image = ski.util.pad(image, ((_imgInfo[INFO_DIAPHRAGM_Y1], _imgInfo[INFO_SIZE_Y] - 1 - _imgInfo[INFO_DIAPHRAGM_Y2]),(_imgInfo[INFO_DIAPHRAGM_X1], _imgInfo[INFO_SIZE_X] - 1 - _imgInfo[INFO_DIAPHRAGM_X2])), 'constant', constant_values=0)
+	return image
+
 def GetIdFromSet(_set, _fluoroFile, _frame):
 	for i in range(len(_set)):
 		if _set[i][SET_FLUORO_FILE] == _fluoroFile and _set[i][SET_FLUORO_FRAME] == _frame:
