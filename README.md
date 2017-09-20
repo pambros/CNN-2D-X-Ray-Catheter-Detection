@@ -2,10 +2,10 @@
 
 This code is the implementation of the method presented in the following paper:
 	
-- P. Ambrosini, D. Ruijters, W.J. Niessen, A. Moelker and T. van Walsum: [Fully Automatic and Real-Time Catheter Segmentation in X-Ray Fluoroscopy][2017Ambrosini]. The 20th International Conference on Medical Image Computing and Computer Assisted Intervention (MICCAI), Lecture Notes in Computer Science, vol. xxxx, pp. xxx-xxx, 2017.
+- P. Ambrosini, D. Ruijters, W.J. Niessen, A. Moelker and T. van Walsum: [Fully Automatic and Real-Time Catheter Segmentation in X-Ray Fluoroscopy][2017Ambrosini]. The 20th International Conference on Medical Image Computing and Computer Assisted Intervention (MICCAI), Lecture Notes in Computer Science, vol. 10434, pp. 577-585, 2017.
 arXiv preprint [![](docs/images/pdf.png)][2017AmbrosiniPreprint]
 
-[2017Ambrosini]: https://www.miccai2017.org/
+[2017Ambrosini]: https://doi.org/10.1007/978-3-319-66185-8_65
 [2017AmbrosiniPreprint]: https://arxiv.org/abs/1707.05137
 
 ![](docs/images/catheterExtractionExample2.png)
