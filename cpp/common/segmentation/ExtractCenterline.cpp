@@ -214,18 +214,9 @@ void ExtractCenterline(qu8 *_imageBuffer, qsize_t _imageSizeX, qsize_t _imageSiz
 	PtList *longestBranch = sortedBranches.rbegin()->second;
 	PtList &centerline = _outCenterline;
 
-	qf64 minDistFirst = (*longestBranch)[0].pos[PT_X];
-	minDistFirst = MIN(minDistFirst, (imageSizeX - 1) - (*longestBranch)[0].pos[PT_X]);
-	minDistFirst = MIN(minDistFirst, (*longestBranch)[0].pos[PT_Y]);
-	minDistFirst = MIN(minDistFirst, (imageSizeY - 1) - (*longestBranch)[0].pos[PT_Y]);
-	qf64 minDistLast = (*longestBranch)[(*longestBranch).size() - 1].pos[PT_X];
-	minDistLast = MIN(minDistLast, (imageSizeX - 1) - (*longestBranch)[(*longestBranch).size() - 1].pos[PT_X]);
-	minDistLast = MIN(minDistLast, (*longestBranch)[(*longestBranch).size() - 1].pos[PT_Y]);
-	minDistLast = MIN(minDistLast, (imageSizeY - 1) - (*longestBranch)[(*longestBranch).size() - 1].pos[PT_Y]);
-	//Vector6 center(static_cast<qf64>(imageSizeX]/2 - 1), static_cast<qf64>(imageSizeY/2 - 1), 0., 0., 0., 0.);
-	//if(GetSquareDistance((*longestBranch)[0].pos, center) < GetSquareDistance((*longestBranch)[(*longestBranch).size() - 1].pos, center)){
-	if(minDistFirst > minDistLast){
-		centerline = PtList(*longestBranch);
+	Vector6 center(static_cast<qf64>(imageSizeX/2 - 1), static_cast<qf64>(imageSizeY/2 - 1), 0., 0., 0., 0.);
+	if(GetSquareDistance((*longestBranch)[0].pos, center) >= GetSquareDistance((*longestBranch)[(*longestBranch).size() - 1].pos, center)){
+        	centerline = PtList(*longestBranch);
 	}
 	else{
 		for(qs32 ptId = static_cast<qs32>((*longestBranch).size()) - 1; ptId >= 0; --ptId){
