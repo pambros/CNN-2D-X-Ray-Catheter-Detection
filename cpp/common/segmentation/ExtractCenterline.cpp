@@ -209,11 +209,11 @@ void ExtractCenterline(qu8 *_imageBuffer, qsize_t _imageSizeX, qsize_t _imageSiz
 		sortedBranches.insert(std::pair<qsize_t, PtList*>((*it)->m_Ptl.size(), &((*it)->m_Ptl)));
 	}
 
-	// try to find the tip (heuristic: it should be closer to the center than the other endpoint)
-	// try to find the tip (heuristic: farther than all borders)
 	PtList *longestBranch = sortedBranches.rbegin()->second;
 	PtList &centerline = _outCenterline;
 
+#define HEURISTIC_TIP_FARTHEST_FROM_THE_BORDER
+#ifdef HEURISTIC_TIP_FARTHEST_FROM_THE_BORDER // try to find the tip (heuristic: farther than all borders)
 	qf64 minDistFirst = (*longestBranch)[0].pos[PT_X];
 	minDistFirst = MIN(minDistFirst, (imageSizeX - 1) - (*longestBranch)[0].pos[PT_X]);
 	minDistFirst = MIN(minDistFirst, (*longestBranch)[0].pos[PT_Y]);
@@ -222,9 +222,11 @@ void ExtractCenterline(qu8 *_imageBuffer, qsize_t _imageSizeX, qsize_t _imageSiz
 	minDistLast = MIN(minDistLast, (imageSizeX - 1) - (*longestBranch)[(*longestBranch).size() - 1].pos[PT_X]);
 	minDistLast = MIN(minDistLast, (*longestBranch)[(*longestBranch).size() - 1].pos[PT_Y]);
 	minDistLast = MIN(minDistLast, (imageSizeY - 1) - (*longestBranch)[(*longestBranch).size() - 1].pos[PT_Y]);
-	//Vector6 center(static_cast<qf64>(imageSizeX]/2 - 1), static_cast<qf64>(imageSizeY/2 - 1), 0., 0., 0., 0.);
-	//if(GetSquareDistance((*longestBranch)[0].pos, center) < GetSquareDistance((*longestBranch)[(*longestBranch).size() - 1].pos, center)){
 	if(minDistFirst > minDistLast){
+#else // try to find the tip (heuristic: it should be closer to the center than the other endpoint)
+	Vector6 center(static_cast<qf64>(imageSizeX]/2 - 1), static_cast<qf64>(imageSizeY/2 - 1), 0., 0., 0., 0.);
+	if(GetSquareDistance((*longestBranch)[0].pos, center) < GetSquareDistance((*longestBranch)[(*longestBranch).size() - 1].pos, center)){
+#endif
 		centerline = PtList(*longestBranch);
 	}
 	else{
