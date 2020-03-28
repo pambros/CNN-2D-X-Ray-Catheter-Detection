@@ -71,7 +71,7 @@ cd ../trainCatheterSegmentationRedirect
 TrainCatheterSegmentationRedirect.bat
 ````
 
-The training lasts about ~25 min. The last output of Keras is something like this: `Epoch 300/300 5s - loss: -9.4055e-01 - DiceCoef: 0.9406 - val_loss: -8.8376e-01 - val_DiceCoef: 0.8838`. A 0.94 DICE coefficient for the training set and 0.88 for the evaluation set. The best weight (giving the best DICE) for the train set `generated/bestTrainWeight.h5` and the test set `generated/bestTestWeight.h5` are saved.
+The training lasts about ~25 min. The last output of Keras is something like this: `Epoch 300/300 5s - loss: -9.4055e-01 - DiceCoef: 0.9406 - val_loss: -8.8376e-01 - val_DiceCoef: 0.8838`. A 0.94 DICE coefficient for the training set and 0.88 for the evaluation set. The best weights (giving the best DICE) for the train set `generated/bestTrainWeight.h5` and the test set `generated/bestTestWeight.h5` are saved.
 
 Finally after the training, we test the full catheter/guidewire extraction method (neural network, skeletonization and spline extraction).
 
