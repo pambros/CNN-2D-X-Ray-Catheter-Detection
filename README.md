@@ -32,7 +32,7 @@ Tested on:
 To build the C++ code you need:
 
 - CMake to build the extraction curve library
-- Boost, especially the compiled libboost_python and libboost_numpy, in order to call C++ function in python
+- Boost, especially the compiled libboost_python and libboost_numpy, in order to call C++ function in python (e.g. on ubuntu/debian `apt-get install libboost-all-dev`)
 
 To execute the python code you need the basic deep learning libraries:
 
