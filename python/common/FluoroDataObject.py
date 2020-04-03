@@ -9,12 +9,6 @@ from DataObject import *
 DILATION_STRUCTURE = (5,5)
 EQUALIZATION = NORMALIZE_CONTRAST_STRETCHING
 
-SET_PROCEDURE = 0
-SET_FLUORO_FILE = 1
-SET_FLUORO_FRAME = 2
-SET_FLUORO_CENTERLINE = 3
-SET_FLUORO_INFO = 4
-
 # fluoro info
 INFO_SIZE_X = 0
 INFO_SIZE_Y = 1
@@ -26,11 +20,23 @@ INFO_DIAPHRAGM_Y1 = 6
 INFO_DIAPHRAGM_Y2 = 7
 INFO_COUNT = 8
 
-def GetFloat32NormalizedFrameWithoutBorders(_image, _bitDepth, _normalize, _imgInfo):
-	image = _image[_imgInfo[INFO_DIAPHRAGM_Y1]:_imgInfo[INFO_DIAPHRAGM_Y2] + 1, _imgInfo[INFO_DIAPHRAGM_X1]:_imgInfo[INFO_DIAPHRAGM_X2] + 1]
-	image = GetFloat32NormalizedFrame(image, _bitDepth, _normalize)
-	image = ski.util.pad(image, ((_imgInfo[INFO_DIAPHRAGM_Y1], _imgInfo[INFO_SIZE_Y] - 1 - _imgInfo[INFO_DIAPHRAGM_Y2]),(_imgInfo[INFO_DIAPHRAGM_X1], _imgInfo[INFO_SIZE_X] - 1 - _imgInfo[INFO_DIAPHRAGM_X2])), 'constant', constant_values=0)
-	return image
+SET_PROCEDURE = 0
+SET_FLUORO_FILE = 1
+SET_FLUORO_FRAME = 2
+SET_FLUORO_CENTERLINE = 3
+SET_FLUORO_INFO = 4
+
+if True:
+# if False:
+	def GetFloat32NormalizedFrameWithoutBorders(_image, _bitDepth, _normalize, _imgInfo):
+		image = _image[_imgInfo[INFO_DIAPHRAGM_Y1]:_imgInfo[INFO_DIAPHRAGM_Y2] + 1, _imgInfo[INFO_DIAPHRAGM_X1]:_imgInfo[INFO_DIAPHRAGM_X2] + 1]
+		image = GetFloat32NormalizedFrame(image, _bitDepth, _normalize)
+		image = ski.util.pad(image, ((_imgInfo[INFO_DIAPHRAGM_Y1], _imgInfo[INFO_SIZE_Y] - 1 - _imgInfo[INFO_DIAPHRAGM_Y2]),(_imgInfo[INFO_DIAPHRAGM_X1], _imgInfo[INFO_SIZE_X] - 1 - _imgInfo[INFO_DIAPHRAGM_X2])), 'constant', constant_values=0)
+		return image
+else:
+	# debug with no removing of the border
+	def GetFloat32NormalizedFrameWithoutBorders(_image, _bitDepth, _normalize, _imgInfo):
+		return GetFloat32NormalizedFrame(_image, _bitDepth, _normalize)
 
 def GetIdFromSet(_set, _fluoroFile, _frame):
 	for i in range(len(_set)):
@@ -86,7 +92,7 @@ class FluoroDataObject(DataObject):
 				_self.m_X[frameId][0] = tmpFrame
 			print("_self.m_X.shape" + str(_self.m_X.shape))
 			print("time " + str(time.time() - t0) + " s")
-			SaveH5SetF32(_savePath + "X.h5", _self.m_X)
+			SaveH5Set(_savePath + "X.h5", _self.m_X)
 		
 		if IsFileExist(_savePath + "Y.h5") == True:
 			_self.m_Y = LoadH5Set(_savePath + "Y.h5")
@@ -103,7 +109,7 @@ class FluoroDataObject(DataObject):
 				_self.m_Y[frameId][0] = tmpFrame
 			print("_self.m_Y.shape" + str(_self.m_Y.shape))
 			print("time " + str(time.time() - t0) + " s")
-			SaveH5SetF32(_savePath + "Y.h5", _self.m_Y)
+			SaveH5Set(_savePath + "Y.h5", _self.m_Y)
 		
 		# divide the data in training and testing set
 		procedureIdList = []

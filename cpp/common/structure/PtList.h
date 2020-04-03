@@ -36,6 +36,10 @@ BEGIN_Q_NAMESPACE
 		Pt(const Vector3 &_pos) : pos(_pos[0], _pos[1], _pos[2], 0., 0., 0.), vec(0., 0., 0.), type(0), _name(NULL){}
 		Pt(const Vector6 &_pos) : pos(_pos), vec(0., 0., 0.), type(0), _name(NULL){}
 
+		~Pt(){
+			SAFE_DELETE(_name);
+		}
+
 		qf64 &x() { return pos[PT_X]; }
 		qf64 &y() { return pos[PT_Y]; }
 		qf64 &z() { return pos[PT_Z]; }
@@ -53,6 +57,10 @@ BEGIN_Q_NAMESPACE
 		qf64 vx() const { return vec[PT_X]; }
 		qf64 vy() const { return vec[PT_Y]; }
 		qf64 vz() const { return vec[PT_Z]; }
+
+		qbool Equal2D(const Pt &_pt){
+			return pos[PT_X] == _pt.pos[PT_X] && pos[PT_Y] == _pt.pos[PT_Y];
+		}
 
 		void setName(const char *newName){
 			SAFE_DELETE(_name);
@@ -168,6 +176,10 @@ BEGIN_Q_NAMESPACE
 
 		inline void push_back(Pt _pt){
 			appendItem(_pt);
+		}
+
+		inline void eraseFirst(void){
+			m_Vec.erase(m_Vec.begin());
 		}
 
 #ifdef NEED_MATRIX

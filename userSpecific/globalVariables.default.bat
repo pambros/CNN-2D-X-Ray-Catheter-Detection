@@ -7,10 +7,11 @@
 @set _MSVC_BIN_X64_DIR=%_MSVC_BIN%/amd64
 @set _MSVC_BIN_X86_AMD64_DIR=%_MSVC_BIN_DIR%/x86_amd64
 
-@set _PYTHON_VERSION=3.6
+@set _PYTHON_VERSION=3.7
 @set _PYTHON_DIR=%_UTIL_DIR%/Python/
 @set _PYTHON_INCLUDE_DIR=%_PYTHON_DIR%/include
-@set _PYTHON_LIB=%_PYTHON_DIR%/libs/python36.lib
+@set _PYTHON_LIB=%_PYTHON_DIR%/libs/python37.lib
+@rem @set _PYTHON_LIB=%_PYTHON_DIR%/libs/libpython37.a
 @set _PYTHON="%_PYTHON_DIR%/python.exe"
 
 @set _CUDA_DIR=%_UTIL_DIR%/CUDA
@@ -20,6 +21,7 @@
 
 @rem name of the compiler using cmake syntax
 @set _COMPILER_NAME="Visual Studio 14 2015 Win64"
+@rem @set _COMPILER_NAME="MinGW Makefiles"
 
 @set _CPU=x64
 
@@ -27,11 +29,6 @@
 
 @set _BOOST_SRC_DIR=%_LIBS_DIR%/boost
 @set _BOOST_LIB_DIR=%_LIBS_DIR%/boost_build/lib
-
-@set _LIB_GPU_ARRAY_DIR=%_LIBS_DIR%/libGpuArray
-@set _LIB_GPU_ARRAY_BIN_DIR=%_LIB_GPU_ARRAY_DIR%/bin
-@set _LIB_GPU_ARRAY_LIB_DIR=%_LIB_GPU_ARRAY_DIR%/lib
-@set _LIB_GPU_ARRAY_INCLUDE_DIR=%_LIB_GPU_ARRAY_DIR%/include
 
 @set PATH= 
 @set PATH=%PATH%;C:/Windows/system32
@@ -48,30 +45,15 @@
 @set VS110COMNTOOLS= 
 @set VS100COMNTOOLS= 
 
-@rem ************************************** for Theano
-@set PATH=%PATH%;%_LIB_GPU_ARRAY_BIN_DIR%
-
 @set LIBRARY_PATH= 
 @set LIBRARY_PATH=%LIBRARY_PATH%;%_CUDA_DIR%/lib/x64
-@set LIBRARY_PATH=%LIBRARY_PATH%;%_LIB_GPU_ARRAY_LIB_DIR%
 
 @set CPLUS_INCLUDE_PATH= 
 @set CPLUS_INCLUDE_PATH=%CPLUS_INCLUDE_PATH%;%_CUDA_DIR%/include
-@set CPLUS_INCLUDE_PATH=%CPLUS_INCLUDE_PATH%;%_LIB_GPU_ARRAY_INCLUDE_DIR%
 
-@set MKL_NUM_THREADS=8
-@set OMP_NUM_THREADS=8
-@set GOTO_NUM_THREADS=8
-@rem @set THEANO_FLAGS=mode=FAST_RUN,floatX=float32,device=cpu,openmp=True
-@rem @set THEANO_FLAGS=mode=FAST_RUN,floatX=float32,device=cpu,openmp=True,blas.ldflags=-L%OPENBLAS_HOME%/bin -lopenblas
+@rem for PyTACELib
+@set _TACE_DLL_DIR=%_PROJECT_PATH%/cpp/generated/%_USER_SPECIFIC%/release
+rem @set _TACE_DLL_DIR=%_PROJECT_PATH%/cpp/generated/%_USER_SPECIFIC%/release/Release
+rem @set PATH=%PATH%;%_TACE_DLL_DIR%
 
-@set THEANO_FLAGS=mode=FAST_RUN,floatX=float32,device=cuda,gpuarray.preallocate=0.80,openmp=True,blas.ldflags=-L%OPENBLAS_HOME%/bin -lopenblas,dnn.conv.algo_bwd_filter=deterministic,dnn.conv.algo_bwd_data=deterministic
-@rem @set THEANO_FLAGS=mode=FAST_RUN,floatX=float32,device=cuda,gpuarray.preallocate=0.80,openmp=True,blas.ldflags=-L%OPENBLAS_HOME%/bin -lopenblas
-
-@rem @set KERAS_BACKEND=tensorflow
-@set KERAS_BACKEND=theano
-
-@rem ************************************** for TACE and PyTACELib
-@set _TACE_BIN_DIR=%_PROJECT_PATH%/cpp/generated/%_USER_SPECIFIC%/Release
-
-@set PYTHONPATH=%PYTHONPATH%;%_PROJECT_PATH%/python/common;%_TACE_BIN_DIR%
+@set PYTHONPATH=%PYTHONPATH%;%_PROJECT_PATH%/python/common;%_TACE_DLL_DIR%

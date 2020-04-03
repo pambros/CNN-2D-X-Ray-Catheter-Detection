@@ -1,21 +1,30 @@
 import numpy as np
 
-import theano
-print(theano.__version__)
-from theano.tensor.shared_randomstreams import RandomStreams
-from theano.sandbox.rng_mrg import MRG_RandomStreams
-import keras
-print(keras.__version__)
-from keras.models import Model, Sequential, model_from_json, load_model
-from keras.layers import Input, Dense, Dropout, BatchNormalization
-from keras.layers.core import Dense, Dropout, Activation, Flatten, Reshape, Permute
-from keras.layers.convolutional import Conv2D, Deconvolution2D, MaxPooling2D, UpSampling2D, Cropping1D, Conv3D, MaxPooling3D, UpSampling3D
-from keras.layers.noise import GaussianNoise
-from keras.optimizers import SGD
-from keras.callbacks import ModelCheckpoint
-from keras import backend as K
+import logging
+logging.getLogger("tensorflow").setLevel(logging.ERROR) # NOTSET DEBUG INFO WARNING ERROR CRITICAL
+
+import tensorflow as tf
+print(tf.__version__)
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Model, Sequential, model_from_json, load_model
+from tensorflow.keras.layers import Input, Dense, Dropout, BatchNormalization, Activation, Flatten, Reshape, Permute
+from tensorflow.keras.layers import GaussianNoise, Conv2D, MaxPooling2D, UpSampling2D, Cropping1D
+from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras import backend as K
 print(K.backend())
-print(keras.backend.image_data_format())
+print(tf.keras.backend.image_data_format())
+
+if K.image_data_format() == 'channels_first':
+	IS_CHANNELS_FIRST = True
+	FEATURE_AXIS = 1
+	Y_AXIS = 2
+	X_AXIS = 3
+else:
+	IS_CHANNELS_FIRST = False
+	Y_AXIS = -3
+	X_AXIS = -2
+	FEATURE_AXIS = -1
 
 BATCH_NORMALIZATION_NO = -1
 BATCH_NORMALIZATION_YES = 0
@@ -42,8 +51,6 @@ def MyReLU(_x):
 class NNets(object):
 	def __init__(_self):
 		m_SamePartActivation = MyReLU
-		# m_DownPartActivation = MyReLU
-		# m_UpPartActivation = MyReLU
 		m_RegularizerL1L2 = False # TODO not implemented
 		m_Dropout = 0.5 # if -1: no dropout else: the percentage of dropped out neurons
 		m_Residual = True
@@ -55,16 +62,18 @@ class NNets(object):
 
 	def ResidualBlock(_self, _inputs, _nbConv, _nbFilters, _nbRow, _nbCol):
 		x = _inputs
+		# print("_inputs.shape " + str(_inputs.shape))
 		for i in range(_nbConv - 1):
 			x = Conv2D(_nbFilters, (_nbRow, _nbCol), padding=_self.m_BorderMode)(x)
 			if _self.m_BatchNormalization != BATCH_NORMALIZATION_NO:
-				x = BatchNormalization(axis=1)(x)
+				x = BatchNormalization(axis=FEATURE_AXIS)(x)
 			x = _self.m_SamePartActivation(x)
 		x = Conv2D(_nbFilters, (_nbRow, _nbCol), padding=_self.m_BorderMode)(x)
 		if _self.m_BatchNormalization != BATCH_NORMALIZATION_NO:
-			x = BatchNormalization(axis=1)(x)
+			x = BatchNormalization(axis=FEATURE_AXIS)(x)
+		# print("x.shape " + str(x.shape))
 		if _self.m_Residual == True:
-			x = keras.layers.add([x, _inputs])
+			x = tf.keras.layers.add([x, _inputs])
 		x = _self.m_SamePartActivation(x)
 		return x
 	
@@ -77,7 +86,7 @@ class NNets(object):
 		else:
 			x = Conv2D(_nbFilters, (2, 2), padding=_self.m_BorderMode, strides=(2,2))(_inputs)
 			if _self.m_BatchNormalization != BATCH_NORMALIZATION_NO:
-				x = BatchNormalization(axis=1)(x)
+				x = BatchNormalization(axis=FEATURE_AXIS)(x)
 			x = _self.m_SamePartActivation(x)
 		return x
 		
@@ -98,7 +107,7 @@ class NNets(object):
 		levels[-1] = residualBlock
 		return levels, _nbFilters
 	
-	def UpsampleBlock(_self, _inputs, _nbFilters, _outputShape):
+	def UpsampleBlock(_self, _inputs, _nbFilters):
 		if _self.m_UpSampling == UPSAMPLING_UPSAMPLE:
 			x = UpSampling2D(size=(2,2))(_inputs)
 			x = Conv2D(_nbFilters, (2, 2), padding=_self.m_BorderMode)(x)	
@@ -106,7 +115,7 @@ class NNets(object):
 			assert False
 			# x = Deconvolution2D(_nbFilters, 2, 2, output_shape=_outputShape, padding=_self.m_BorderMode, strides=(2,2))(_inputs)
 		if _self.m_BatchNormalization != BATCH_NORMALIZATION_NO:
-			x = BatchNormalization(axis=1)(x)	
+			x = BatchNormalization(axis=FEATURE_AXIS)(x)	
 		x = _self.m_SamePartActivation(x)
 		return x
 
@@ -115,17 +124,20 @@ class NNets(object):
 		residualUpBlock = _inputs
 		for i in range(len(_convPerLevel)):
 			_nbFilters = _nbFilters//2
-			upBlock = _self.UpsampleBlock(residualUpBlock, _nbFilters, (None, _nbFilters, residualUpBlock._keras_shape[2]*2, residualUpBlock._keras_shape[3]*2))
+			upBlock = _self.UpsampleBlock(residualUpBlock, _nbFilters)
+			# print("upBlock.shape " + str(upBlock.shape))
 			# upBlock = Dropout(0.5)(upBlock)
-			mergeBlock = keras.layers.concatenate([upBlock, _inputLevels[i]], axis=1)
+			mergeBlock = tf.keras.layers.concatenate([upBlock, _inputLevels[i]], axis=FEATURE_AXIS)
 			residualUpBlock = _self.ResidualBlock(mergeBlock, _convPerLevel[i], _nbFilters*2, _kernelSize, _kernelSize)
 			levels.append(residualUpBlock)
 		return levels
 
 	def DefineDeepUVNet(_self, _inputShape, _nbFilters, _kernelSize, _convPerLevel, _upConvPerLevel, _optimizer):
 		inputs = Input(shape=_inputShape)
+		# print("inputs.shape " + str(inputs.shape))
 		x = GaussianNoise(0.03)(inputs)
 		shortcut = Conv2D(_nbFilters, (1, 1), padding=_self.m_BorderMode)(x)
+		# print("shortcut.shape " + str(shortcut.shape))
 		
 		levels, nbFilters = _self.DownsamplingPart(shortcut, _nbFilters, _kernelSize, _convPerLevel)
 		

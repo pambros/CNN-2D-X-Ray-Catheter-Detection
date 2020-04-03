@@ -92,6 +92,7 @@ if gZipLoaded == True:
 		
 	gZipFileManager = ZipFileManager()
 
+# Warning be careful, it works only if _folder is an absolute path
 def ZipAndDeleteFolder(_folder):
 	if os.path.exists(_folder):
 		global gZipFileManager
@@ -104,6 +105,10 @@ def ZipAndDeleteFolder(_folder):
 		# CallExecutable(_7_ZIP, "a -mx0 \"" + _folder + ".zip\" \"" + _folder + "\\*\" -y " + stdout + " " + stderr)
 		shutil.rmtree(_folder)
 	return
+
+def DeleteFile(_fileName):
+	if os.path.isfile(_fileName) == True:
+		os.remove(_fileName)
 
 def OpenFile(_fileName, _flags):
 	if gZipLoaded == True:
@@ -156,6 +161,24 @@ def IsFileExist(_fileName):
 	
 	return os.path.isfile(_fileName)
 
+def GetFileSize(_fileName):
+	# if the file is inside a zip file "//C:/blabla.zip//insideZip/lala.txt"
+	if _fileName[0] == '/' and _fileName[1] == '/':
+		pos = _fileName.find("//", 2)
+		zipFile = _fileName[2:pos]
+		filename = _fileName[pos + 2:]
+		realFilename = zipFile[:-4] + '/' + filename
+		
+		if os.path.isfile(realFilename) == True:
+			statinfo = os.stat(realFilename)
+			return statinfo.st_size
+		# else: # TODO do the zip part
+		
+	if os.path.isfile(_fileName) == True:
+		statinfo = os.stat(_fileName)
+		return statinfo.st_size
+	return 0
+
 def ListFilesInDir(_dirName):
 	return os.listdir(_dirName)
 	
@@ -186,16 +209,57 @@ def MakeDirThreadSafe(_path):
 			raise
 	return
 	
+class H5Set(object):
+	def __init__(_self, _fileName, _loadAll = True):
+		# print("H5Set::__init__()")
+		_self.m_F = h5py.File(_fileName, 'r')
+		_self.m_LoadAll = _loadAll
+		_self.shape = _self.m_F["set"].shape
+		_self.dtype = _self.m_F["set"].dtype
+		_self.m_Size = _self.m_F["set"].shape[0]
+
+		if _self.m_LoadAll == True:
+			_self.m_Set = _self.m_F["set"][...]
+			_self.m_F.close()
+			_self.m_F = None
+
+	def __exit__(_self):
+		# print("H5Set::__exit__()")
+		if _self.m_LoadAll == False:
+			# print("_self.m_F.close()")
+			_self.m_F.close()
+		return
+
+	def __del__(_self):
+		# print("H5Set::__del__()")
+		_self.__exit__()
+		return
+
+	def __len__(_self):
+		# print("H5Set::__len__()")
+		return _self.m_Size
+
+	def __getitem__(_self, _key):
+		# print("H5Set::__getitem__()")
+		if _self.m_LoadAll == True:
+			return _self.m_Set[_key]
+		return _self.m_F["set"][_key][...]
+
 # _set can be a numpy object or a python list of numpy object
-# numpy object with float (32bits)
-def SaveH5SetF32(_path, _set):
+def SaveH5Set(_path, _set):
+	# gzip Good compression, moderate speed
+	# lzf Low to moderate compression, very fast
 	f = h5py.File(_path, 'w')
 	if type(_set).__module__ == 'numpy':
-		f.create_dataset('set', np.shape(_set), dtype='f4', compression="lzf")
+		# f.create_dataset('set', np.shape(_set), dtype='f4', compression="lzf")
+		f.create_dataset('set', np.shape(_set), dtype=_set.dtype, compression="lzf")
+		# f.create_dataset('set', np.shape(_set), dtype=_set.dtype, compression="gzip", compression_opts=9) # too slow maybe should try the default compression_opts=4
 		f['set'][...] = _set
 	else:
 		for i in range(len(_set)):
-			f.create_dataset('set' + str(i), np.shape(_set[i]), dtype='f4', compression="lzf")
+			# f.create_dataset('set' + str(i), np.shape(_set[i]), dtype='f4', compression="lzf")
+			f.create_dataset('set' + str(i), np.shape(_set[i]), dtype=_set[i].dtype, compression="lzf")
+			# f.create_dataset('set' + str(i), np.shape(_set[i]), dtype=_set[i].dtype, compression="gzip", compression_opts=9) # too slow maybe should try the default compression_opts=4
 			f['set' + str(i)][...] = _set[i]
 	f.close()
 

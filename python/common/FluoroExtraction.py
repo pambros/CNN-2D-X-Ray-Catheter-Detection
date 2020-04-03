@@ -1,4 +1,3 @@
-from __future__ import division
 import scipy as sp
 import time
 from skimage.morphology import skeletonize
@@ -50,7 +49,7 @@ def GetCenterline(_image, _imgInfo = None):
 		# print(centerline[:5])
 	if _imgInfo != None:
 		centerline = centerline + (_imgInfo[INFO_PAD_X] + _imgInfo[INFO_DIAPHRAGM_X1], _imgInfo[INFO_PAD_Y] + _imgInfo[INFO_DIAPHRAGM_Y1])
-	centerline = centerline.clip((0, 0), (image.shape[1] - SMALL_POSITIVE_NUMBER, image.shape[0] - SMALL_POSITIVE_NUMBER))
+	centerline = centerline.clip((0, 0), (_image.shape[1] - SMALL_POSITIVE_NUMBER, _image.shape[0] - SMALL_POSITIVE_NUMBER))
 	
 	if PYTACELIB_DEBUG_OUTPUT == True:
 		return centerline, debugStepList
@@ -76,7 +75,12 @@ class FluoroExtraction(object):
 		nbConvPerLayer = [2, 2, 2, 2, 2, 2, 2]
 		nbDeconvPerLayer = [2, 2, 2, 2, 2, 2]
 		
-		_self.m_Model = nnets.DefineDeepUVNet((nbUsedChannel, SIZE_Y, SIZE_X), _nbFilters=nbStartFilter, _kernelSize=kernelSize \
+		if IS_CHANNELS_FIRST == True:
+			shape_input = (nbUsedChannel, SIZE_Y, SIZE_X)
+		else:
+			shape_input = (SIZE_Y, SIZE_X, nbUsedChannel)
+
+		_self.m_Model = nnets.DefineDeepUVNet(shape_input, _nbFilters=nbStartFilter, _kernelSize=kernelSize \
 			, _convPerLevel=nbConvPerLayer, _upConvPerLevel=nbDeconvPerLayer, _optimizer=optimizer)
 		print("input " + str(_self.m_Model.get_input_shape_at(0)) + " output " + str(_self.m_Model.get_output_shape_at(0)))
 		print(len(_self.m_Model.layers))
@@ -87,7 +91,11 @@ class FluoroExtraction(object):
 
 	def ExtractCenterline(_self, _images, _imgInfo = None):
 		t0 = time.time()
-		Y = _self.m_Model.predict(_images, batch_size=1)
+		if IS_CHANNELS_FIRST == False:
+			image = np.moveaxis(_images, 1, 3)
+		Y = _self.m_Model.predict(image, batch_size=1)
+		if IS_CHANNELS_FIRST == False:
+			Y = np.moveaxis(Y, 3, 1)
 		print("_self.m_Model.predict " + str(time.time() - t0) + " s")
 		
 		if PYTACELIB_DEBUG_OUTPUT == True:

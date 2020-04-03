@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.13)
 
 project(TACE)
 
@@ -8,7 +8,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DQ_DEBUG")
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BUILD_TYPE})
 
 set(TACELIB_PATH "")
-include_directories("/")
+include_directories("./")
 
 option(USE_AVX "Use AVX instructions" OFF)
 if(MSVC)
@@ -85,17 +85,21 @@ endif(USE_ITK)
 
 option(MAKE_PYTHON_WRAPPER "Use python wrapper" ON)
 if(MAKE_PYTHON_WRAPPER)
-	find_package(PythonLibs ${PYTHON_VERSION} REQUIRED)
-	include_directories(${PYTHON_INCLUDE_DIRS})
+	find_package (Python COMPONENTS Development)
+	# message(${Python_LIBRARIES})
+	# message(${Python_INCLUDE_DIRS})
+	
+	include_directories(${Python_INCLUDE_DIRS})
 
 	set(Boost_USE_STATIC_LIBS ON)
 	# set(Boost_USE_STATIC_LIBS OFF)
 	set(Boost_USE_MULTITHREADED ON)
 	set(Boost_USE_STATIC_RUNTIME OFF)
-	add_definitions(-DBOOST_PYTHON_STATIC_LIB)
-	find_package(Boost COMPONENTS python REQUIRED)
-	include_directories(${Boost_INCLUDE_DIR})
-	link_directories(${BOOST_LIBRARYDIR})
+	find_package(Boost COMPONENTS python37 numpy37 REQUIRED)
+	include_directories(${Boost_INCLUDE_DIRS})
+	link_directories(${Boost_LIBRARY_DIRS})
+	# message(${Boost_INCLUDE_DIRS})
+	# message(${Boost_LIBRARY_DIRS})
 
 	if(PYTHON_DEBUG_OUTPUT)
 		add_definitions(-DPYTHON_DEBUG_OUTPUT)
@@ -109,9 +113,11 @@ if(MAKE_PYTHON_WRAPPER)
 	target_link_libraries(
 		PyTACELib
 		${Boost_LIBRARIES}
-		${PYTHON_LIBRARIES}
+		${Python_LIBRARIES}
 		TACELib
 	)
+	# message(${Boost_LIBRARIES})
+	# message(${Python_LIBRARIES})
 	
 	if(ADDITIONAL_LIBRARIES_DEBUG)
 		# message(${ADDITIONAL_LIBRARIES_DEBUG}) # print with no delimiter
@@ -125,5 +131,9 @@ if(MAKE_PYTHON_WRAPPER)
 	endif()
 	
 	# don't prepend wrapper library name with lib
-	set_target_properties(PyTACELib PROPERTIES SUFFIX ".pyd" IMPORT_PREFIX "" PREFIX "")
+	if (WIN32)
+		set_target_properties(PyTACELib PROPERTIES SUFFIX ".pyd" IMPORT_PREFIX "" PREFIX "")
+	else()
+		set_target_properties(PyTACELib PROPERTIES SUFFIX ".so" IMPORT_PREFIX "" PREFIX "")
+	endif()
 endif(MAKE_PYTHON_WRAPPER)

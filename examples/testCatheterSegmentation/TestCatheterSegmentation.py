@@ -1,9 +1,6 @@
-from __future__ import division
-import sys
 import numpy as np
 import random
 
-sys.setrecursionlimit(2000)
 np.random.seed(987654)
 random.seed(1234569)
 

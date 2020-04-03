@@ -7,8 +7,8 @@
 #endif
 
 // TODO because of "bug"? in boost 1.63 -> should be removed with more recent boost version
-#define BOOST_LIB_NAME "boost_numpy"
-#include <boost/config/auto_link.hpp>
+// #define BOOST_LIB_NAME "boost_numpy"
+// #include <boost/config/auto_link.hpp>
 
 #include <boost/python.hpp>
 #include <boost/python/numpy.hpp>

@@ -1,4 +1,3 @@
-from __future__ import division
 import scipy as sp
 import numpy as np
 import random

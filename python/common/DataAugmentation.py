@@ -9,6 +9,9 @@ import scipy.interpolate
 import scipy.ndimage
 import scipy.ndimage.interpolation
 
+from NnetsX import IS_CHANNELS_FIRST
+# from File import SavePickle
+
 INTENSITY_FACTOR = 0.2
 VECTOR_FIELD_SIGMA = 5. # in pixel
 ROTATION_FACTOR = 10 # degree
@@ -188,10 +191,16 @@ def GenerateImageOnTheFly(_createImageXFct, _GetIdFromNeedFct, _X, _previousImag
 		for i in range(_epochSize):
 			if currentBatch == 0:
 				if _3Dshape == False:
-					x = np.empty((_batchSize, nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
+					if IS_CHANNELS_FIRST == True:
+						x = np.empty((_batchSize, nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
+					else:
+						x = np.empty((_batchSize, shapeX[2], shapeX[3], nbChannels), dtype=np.float32)
 				else:
 					x = np.empty((_batchSize, 1, nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
-				y = np.empty((_batchSize, shapeY[1], shapeY[2], shapeY[3]), dtype=np.float32)
+				if IS_CHANNELS_FIRST == True:
+					y = np.empty((_batchSize, shapeY[1], shapeY[2], shapeY[3]), dtype=np.float32)
+				else:
+					y = np.empty((_batchSize, shapeY[2], shapeY[3], shapeY[1]), dtype=np.float32)
 			# if _nbData != -1:
 				# rndStateNp = np.random.get_state()
 				# rndState = random.getstate()
@@ -206,6 +215,7 @@ def GenerateImageOnTheFly(_createImageXFct, _GetIdFromNeedFct, _X, _previousImag
 			imgY = _Y[_GetIdFromNeedFct(imgId, _setFiles, _needSetY),...]
 			
 			if random.random() > _keepPctOriginal:
+			# if False:
 				if _nbData != -1:
 					rndStateNp = np.random.get_state()
 					rndState = random.getstate()
@@ -228,79 +238,68 @@ def GenerateImageOnTheFly(_createImageXFct, _GetIdFromNeedFct, _X, _previousImag
 					np.random.set_state(rndStateNp)
 					random.setstate(rndState)
 			
-			x[currentBatch][...] = imgX[...]
-			y[currentBatch][...] = imgY[...]
+			if IS_CHANNELS_FIRST == True:
+				x[currentBatch][...] = imgX[...]
+				y[currentBatch][...] = imgY[...]
+			else:
+				imgXtmp = np.rollaxis(imgX, 0, 3)
+				imgYtmp = np.rollaxis(imgY, 0, 3)
+				x[currentBatch][...] = imgXtmp[...]
+				y[currentBatch][...] = imgYtmp[...]
 			currentBatch = currentBatch + 1
 			if currentBatch == _batchSize:
 				currentBatch = 0
-				# if debug <= 20: # debug
-					# SavePickle([x,y], "generated\\testPickle" + str(debug))
+				# if debug <= 4: # debug
+					# SavePickle([x,y], "generated/testPickle" + str(debug))
 					# debug = debug + 1
 				yield (x, y)
-				# yield (np.copy(x), np.copy(y))
 			elif i == _epochSize - 1:
 				yield (x[:currentBatch], y[:currentBatch])
-				# yield (np.copy(x[:currentBatch]), np.copy(y[:currentBatch]))
 				currentBatch = 0
 				
-def GenerateValidationOnTheFly(_createImageXFct, _GetIdFromNeedFct, _X, _previousImages, _Y, _outputTest, _previousOutput, _setFiles, _needSetX, _needSetY, _batchSize, _3Dshape=False):
+def GenerateValidationOnTheFly(_createImageXFct, _GetIdFromNeedFct, _X, _previousImages, _Y, _outputTest, _previousOutput, _setFiles, _needSetX, _needSetY, _batchSize=None, _3Dshape=False):
 	shapeX = _X.shape
 	shapeY = _Y.shape
 	nbChannels = shapeX[1] + _previousImages + _previousOutput
-	currentBatch = 0
+	# currentBatch = 0
 	imgX = np.empty((nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
 	blackImage = np.zeros((shapeX[2], shapeX[3]), dtype=np.float32)
 	# debug = 0
 	while 1:
 		for imgId in range(0, len(_setFiles)):
-			if currentBatch == 0:
-				if _3Dshape == False:
-					x = np.empty((_batchSize, nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
-				else:
-					x = np.empty((_batchSize, 1, nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
-				y = np.empty((_batchSize, shapeY[1], shapeY[2], shapeY[3]), dtype=np.float32)
+			# if currentBatch == 0:
+				# if _3Dshape == False:
+					# if IS_CHANNELS_FIRST == True:
+						# x = np.empty((_batchSize, nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
+					# else:
+						# x = np.empty((_batchSize, shapeX[2], shapeX[3], nbChannels), dtype=np.float32)
+				# else:
+					# x = np.empty((_batchSize, 1, nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
+				# if IS_CHANNELS_FIRST == True:
+					# y = np.empty((_batchSize, shapeY[1], shapeY[2], shapeY[3]), dtype=np.float32)
+				# else:
+					# y = np.empty((_batchSize, shapeY[2], shapeY[3], shapeY[1]), dtype=np.float32)
+
 			_createImageXFct(imgX, imgId, _X, _previousImages, _outputTest, _previousOutput, _setFiles, _needSetX, _needSetY, blackImage)
 			imgY = _Y[_GetIdFromNeedFct(imgId, _setFiles, _needSetY),...]
-			
-			x[currentBatch][...] = imgX[...]
-			y[currentBatch][...] = imgY[...]
-			currentBatch = currentBatch + 1
-			if currentBatch == _batchSize:
-				currentBatch = 0
-				# if debug <= 4: # debug
-					# SavePickle([x,y], "generated\\testPickle33" + str(debug))
-					# debug = debug + 1
-				yield (x, y)
-			elif imgId == len(_setFiles) - 1:
-				yield (x[:currentBatch], y[:currentBatch])
-				currentBatch = 0
 
-def GenerateTestOnTheFly(_createImageXFct, _X, _previousImages, _outputTest, _previousOutput, _setFiles, _needSetX, _needSetY, _batchSize, _3Dshape=False):
-	shapeX = _X.shape
-	nbChannels = shapeX[1] + _previousImages + _previousOutput
-	currentBatch = 0
-	imgX = np.empty((nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
-	blackImage = np.zeros((shapeX[2], shapeX[3]), dtype=np.float32)
-	# debug = 0
-	while 1:
-		for imgId in range(0, len(_setFiles)):
-			if currentBatch == 0:
-				if _3Dshape == False:
-					x = np.empty((_batchSize, nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
-				else:
-					x = np.empty((_batchSize, 1, nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
-
-			# imgX = np.empty((nbChannels, shapeX[2], shapeX[3]), dtype=np.float32)
-			_createImageXFct(imgX, imgId, _X, _previousImages, _outputTest, _previousOutput, _setFiles, _needSetX, _needSetY, blackImage)
-			
-			x[currentBatch][...] = imgX[...]
-			currentBatch = currentBatch + 1
-			if currentBatch == _batchSize:
-				currentBatch = 0
+			if IS_CHANNELS_FIRST == True:
+				# x[currentBatch][...] = imgX[...]
+				# y[currentBatch][...] = imgY[...]
+				yield (np.copy(imgX), np.copy(imgY))
+			else:
+				imgXtmp = np.rollaxis(imgX, 0, 3)
+				imgYtmp = np.rollaxis(imgY, 0, 3)
+				# x[currentBatch][...] = imgXtmp[...]
+				# y[currentBatch][...] = imgYtmp[...]
+				yield (imgXtmp, imgYtmp)
+			# currentBatch = currentBatch + 1
+			# if currentBatch == _batchSize:
+				# currentBatch = 0
 				# if debug <= 4: # debug
-					# SavePickle(x, "generated\\testPickle33" + str(debug))
+					# SavePickle([x,y], "generated/testPickle33" + str(debug))
 					# debug = debug + 1
-				yield x
-			elif imgId == len(_setFiles) - 1:
-				yield x[:currentBatch]
-				currentBatch = 0
+				# yield (x, y)
+			# elif imgId == len(_setFiles) - 1:
+				# yield (x[:currentBatch], y[:currentBatch])
+				# currentBatch = 0

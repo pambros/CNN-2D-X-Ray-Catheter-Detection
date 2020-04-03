@@ -66,7 +66,8 @@ public:
 #elif defined(_MSC_VER)
 		errno_t errNo = fopen_s(&m_File, _filename, _mode);
 		if(errNo != 0){
-			qPrint("errNo %d\n", errNo);
+			qPrintStdErr("qStdFile::qStdFile errNo %d\n", errNo);
+			qPrintStdErr("qStdFile::qStdFile _filename %s\n", _filename);
 			m_Err = 0;
 		}
 #else

@@ -18,23 +18,15 @@ import skimage.morphology
 import warnings
 
 from Util import *
+from File import *
 
 NORMALIZE_NO = 0
 NORMALIZE_SIMPLE = 1
 NORMALIZE_CONTRAST_STRETCHING = 2
 # NORMALIZE_ADAPTATIVE_EQUALIZATION = 3
 
-def GetFloat32NormalizedFrame(_image, _pixelSize, _normalize = NORMALIZE_NO):
-	if _pixelSize == 8:
-		maxValue = 255
-	elif _pixelSize == 16:
-		maxValue = 65535
-	elif _pixelSize == 10:
-		maxValue = 1023
-	else:
-		print("GetFloat32NormalizedFrame():: WARNING NOT IMPLEMENTED _pixelSize = " + str(_pixelSize))
-		
-	_image = _image.astype(np.float32)
+# _image type should be np.float32
+def NormalizeFrame(_image, _normalize = NORMALIZE_NO):
 	if _normalize == NORMALIZE_SIMPLE:
 		min = np.min(_image)
 		max = np.max(_image)
@@ -45,7 +37,24 @@ def GetFloat32NormalizedFrame(_image, _pixelSize, _normalize = NORMALIZE_NO):
 	# elif _normalize == NORMALIZE_ADAPTATIVE_EQUALIZATION
 		# return ski.exposure.equalize_adapthist(_image, clip_limit=0.03):
 
-	return _image/maxValue
+	return _image
+
+def GetMaxValue(_pixelSize):
+	if _pixelSize == 8:
+		return 255
+	elif _pixelSize == 16:
+		return 65535
+	elif _pixelSize == 10:
+		return 1023
+	else:
+		print("GetMaxValue():: WARNING NOT IMPLEMENTED _pixelSize = " + str(_pixelSize))
+	return 65535
+
+def GetFloat32NormalizedFrame(_image, _pixelSize, _normalize = NORMALIZE_NO):
+	_image = _image.astype(np.float32)
+	if _normalize != NORMALIZE_NO:
+		return NormalizeFrame(_image, _normalize)
+	return _image/GetMaxValue(_pixelSize)
 
 def ReadOnlyDicomInfo(_filename):
 	dcmInfo = pydicom.read_file(_filename, stop_before_pixels = True, defer_size = 16)
@@ -180,10 +189,10 @@ def LoadImage(_path):
 	return ski.io.imread(_path)
 	
 def SaveImage(_path, _buffer):
-	# with warnings.catch_warnings():
-		# warnings.simplefilter("ignore")
-		# ski.io.imsave(_path, _buffer)
-	ski.io.imsave(_path, _buffer)
+	with warnings.catch_warnings():
+		warnings.simplefilter("ignore")
+		ski.io.imsave(_path, _buffer)
+	# ski.io.imsave(_path, _buffer)
 
 def StackImagesMultiChan(_imgs, _columns, _rows):
 	Xid = 2
@@ -199,17 +208,42 @@ def StackImagesMultiChan(_imgs, _columns, _rows):
 			bigImage[chan, i*_imgs.shape[Yid]:(i+1)*_imgs.shape[Yid], j*_imgs.shape[Xid]:(j+1)*_imgs.shape[Xid]] = _imgs[index][chan][...]
 	return bigImage
 
-def SaveSetImagesMultiChan(_path, _imgs, _columns, _rows, _compressed = False):
+def SaveSetImagesMultiChan(_path, _imgs, _columns, _rows):
 	image = StackImagesMultiChan(_imgs, _columns, _rows)
 	image = np.moveaxis(image, 0, -1)
-	SaveImage(_path, (image*255).astype(np.uint8))
+	image = image*255
+	image = image.astype(np.uint8)
+	SaveImage(_path, image)
 	
+def ConcatImagesAndSave(_imageNameList, _concatImageName, _sizeX, _sizeY, _columns, _rows):
+	imageList = np.zeros((len(_imageNameList), _sizeY, _sizeX, 3), dtype = np.uint8)
+	
+	for i in range(len(_imageNameList)):
+		if IsFileExist(_imageNameList[i]) == True:
+			imageList[i][...] = LoadImage(_imageNameList[i])
+
+	imageList = np.rollaxis(imageList, 3, 1)
+	
+	concatImage = StackImagesMultiChan(imageList, _columns, _rows)
+	imageList = None
+	concatImage = np.moveaxis(concatImage, 0, -1)
+	
+	SaveImage(_concatImageName, concatImage)
+
 def GrayToRGB(_image):
-	image = np.empty((3, _image.shape[0], _image.shape[1]))
+	image = np.empty((3, _image.shape[0], _image.shape[1]), dtype = _image.dtype)
 	image[0][...] = _image[...]
 	image[1][...] = _image[...]
 	image[2][...] = _image[...]
 	return np.moveaxis(image, 0, -1)
+	
+def GrayToRGBSet(_imageSet):
+	imageSet = np.empty((3, _imageSet.shape[0], _imageSet.shape[1], _imageSet.shape[2]), dtype = _imageSet.dtype)
+	for i in range(len(_imageSet)):
+		imageSet[0][i] = _imageSet[i][...]
+		imageSet[1][i] = _imageSet[i][...]
+		imageSet[2][i] = _imageSet[i][...]
+	return np.moveaxis(imageSet, 0, -1)
 
 # _image has to be smaller than (_newImageSizeX, _newImageSizeY)
 # _image.shape has even numbers
