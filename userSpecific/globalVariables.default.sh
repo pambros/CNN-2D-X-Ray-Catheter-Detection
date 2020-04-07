@@ -9,6 +9,8 @@ _CMAKE=cmake
 _COMPILER_NAME="Unix Makefiles"
 
 _BOOST_SRC_DIR=/usr
+_BOOST_PYTHON_LIB=python37
+_BOOST_NUMPY_LIB=numpy37
 
 export PATH=$_CUDA_DIR/bin:$PATH
 export LD_LIBRARY_PATH=$_CUDA_DIR/lib64:$LD_LIBRARY_PATH
