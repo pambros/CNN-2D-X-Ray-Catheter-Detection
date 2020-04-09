@@ -10,32 +10,12 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BUILD_TYPE})
 set(TACELIB_PATH "")
 include_directories("./")
 
-option(USE_AVX "Use AVX instructions" OFF)
-if(MSVC)
-	if(USE_AVX)
-		add_definitions(-DUSE_AVX)
-		ADD_DEFINITIONS(/arch:AVX)
-	endif(USE_AVX)
-	# ADD_DEFINITIONS(/Qvec-report:1)
-	# ADD_DEFINITIONS(/Qvec-report:2)
-	# ADD_DEFINITIONS(/GL)
-	# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LTCG")
-endif(MSVC)
-
-option(USE_ITK "Use ITK library" ON)
-if(USE_ITK)
-	find_package(ITK REQUIRED)
-	include(${ITK_USE_FILE})
-	add_definitions(-DUSE_ITK)
-endif(USE_ITK)
-
 set(TACE_SPECIFIC_SOURCES)
-if(USE_ITK)
-	add_definitions(-DNEED_FILE)
-	list(APPEND TACE_SPECIFIC_SOURCES
+add_definitions(-DNEED_FILE)
+list(APPEND TACE_SPECIFIC_SOURCES
 	${TACELIB_PATH}common/util/File.cpp
 	${TACELIB_PATH}common/util/File.h)
-endif(USE_ITK)
+include_directories("../thirdparties/stb/")
 
 add_library(
 	# TACELib STATIC
@@ -63,12 +43,13 @@ add_library(
 # set_target_properties(TACELib PROPERTIES COMPILE_FLAGS "-DQ_STATIC=1")
 set_target_properties(TACELib PROPERTIES COMPILE_FLAGS "-DQ_SHARED=1 -DQ_DLL_EXPORTS=1")
 
+install(TARGETS TACELib DESTINATION lib)
+
 target_link_libraries(
 	TACELib
 	${EXTRA_LIBS}
 )
 
-if(USE_ITK)
 add_executable(
 	TACE
 	src/TACE/main.cpp
@@ -79,9 +60,9 @@ add_executable(
 target_link_libraries(
 	TACE
 	TACELib
-	${ITK_LIBRARIES}
 )
-endif(USE_ITK)
+
+install(TARGETS TACE DESTINATION bin)
 
 option(MAKE_PYTHON_WRAPPER "Use python wrapper" ON)
 if(MAKE_PYTHON_WRAPPER)
@@ -136,4 +117,6 @@ if(MAKE_PYTHON_WRAPPER)
 	else()
 		set_target_properties(PyTACELib PROPERTIES SUFFIX ".so" IMPORT_PREFIX "" PREFIX "")
 	endif()
+
+	install(TARGETS PyTACELib DESTINATION lib)
 endif(MAKE_PYTHON_WRAPPER)

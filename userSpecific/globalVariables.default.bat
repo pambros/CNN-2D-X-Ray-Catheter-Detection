@@ -1,6 +1,6 @@
 @set _UTIL_DIR=C:/Programs
 
-@set _MINGW_BIN_DIR=%_UTIL_DIR%/mingw64/bin
+@rem @set _MINGW_BIN_DIR=%_UTIL_DIR%/mingw64/bin
 
 @set _MSVC_DIR=%_UTIL_DIR%/Microsoft Visual Studio 14.0
 @set _MSVC_BIN_DIR=%_MSVC_DIR%/VC/bin
@@ -15,7 +15,7 @@
 @set _PYTHON="%_PYTHON_DIR%/python.exe"
 
 @set _CUDA_DIR=%_UTIL_DIR%/CUDA
-@set OPENBLAS_HOME=%_UTIL_DIR%/OpenBLAS
+@rem @set OPENBLAS_HOME=%_UTIL_DIR%/OpenBLAS
 
 @set _CMAKE="%_UTIL_DIR%/CMake/bin/cmake.exe"
 
@@ -28,17 +28,20 @@
 @set _LIBS_DIR=C:/Libs
 
 @set _BOOST_SRC_DIR=%_LIBS_DIR%/boost
-@set _BOOST_LIB_DIR=%_LIBS_DIR%/boost_build/lib
+@set _BOOST_PYTHON_LIB=python37
+@set _BOOST_NUMPY_LIB=numpy37
+@rem @set _BOOST_LIB_DIR=%_LIBS_DIR%/boost_build/lib
 
 @set PATH= 
 @set PATH=%PATH%;C:/Windows/system32
-@set PATH=%PATH%;%_MINGW_BIN_DIR%
+@rem @set PATH=%PATH%;%_MINGW_BIN_DIR%
 @set PATH=%PATH%;%_CUDA_DIR%/bin
 @set PATH=%PATH%;%_CUDA_DIR%/libnwp
 @set PATH=%PATH%;%_MSVC_BIN_X64_DIR%
 @set PATH=%PATH%;%_MSVC_BIN_X86_AMD64_DIR%
 @set PATH=%PATH%;%_MSVC_BIN_DIR%
-@set PATH=%PATH%;%OPENBLAS_HOME%/bin
+@rem @set PATH=%PATH%;%OPENBLAS_HOME%/bin
+@set VS160COMNTOOLS= 
 @set VS150COMNTOOLS= 
 @set VS140COMNTOOLS=%_MSVC_DIR%/Common7/Tools/
 @set VS120COMNTOOLS= 

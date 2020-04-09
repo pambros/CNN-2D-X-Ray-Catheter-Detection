@@ -1,23 +1,17 @@
 #include "common/segmentation/ExtractCenterline.h"
 
-#ifdef WIN32
-	#pragma warning(push)
-	#pragma warning (disable : 4996)
-#endif
-#include "itkImage.h"
-#include "itkImageFileReader.h"
-#ifdef WIN32
-	#pragma warning(pop)
-#endif
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 USING_Q_NAMESPACE
 
 void PathExtraction2D(int _argc, char **_argv){
 	qPrint("# ExtractCenterline\n");
 
-	qString inImageFileName = qString(_argv[2]);
-	qString outCenterlineFileName = qString(_argv[3]);
+	qString inImageFileName = qString(_argv[1]);
+	qString outCenterlineFileName = qString(_argv[2]);
 
+#ifdef USE_ITK // not used anymore, just for information purposed
 	typedef itk::Image<qu8, 2> ImageType;
 	typedef itk::ImageFileReader<ImageType> ReaderType;
 
@@ -36,6 +30,15 @@ void PathExtraction2D(int _argc, char **_argv){
 
 	qsize_t imageSizeX = size.m_Size[0];
 	qsize_t imageSizeY = size.m_Size[1];
+#else
+	int iImageSizeX;
+	int iImageSizeY;
+	qu8* imageBuffer = stbi_load(inImageFileName.c_str(), &iImageSizeX, &iImageSizeY, NULL, 1);
+
+	qsize_t imageSizeX = iImageSizeX;
+	qsize_t imageSizeY = iImageSizeY;
+#endif
+
 	PtList centerline;
 
 #ifdef PYTHON_DEBUG_OUTPUT
