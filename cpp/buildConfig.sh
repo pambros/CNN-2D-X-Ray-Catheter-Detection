@@ -21,7 +21,6 @@ cd ..
 mkdir -p release
 cd release
 
-# echo $_CMAKE -G "$_COMPILER_NAME" "../../../" -DCMAKE_BUILD_TYPE=Release $_OPTIONS
 $_CMAKE -G "$_COMPILER_NAME" "../../../" -DCMAKE_INSTALL_PREFIX=$HOME/opt/ -DCMAKE_BUILD_TYPE=Release $_OPTIONS
 
 if [ "$1" != "-nopause" ]; then
