@@ -6,13 +6,13 @@
 @if not %_COMPILER_NAME% == "MinGW Makefiles" (
 	@%_CMAKE% --build . --config Debug
 	@%_CMAKE% --build . --config Release
-@) else (
+) else (
 	@cd debug
 	@%_CMAKE% --build .
 	@cd ../release
 	@%_CMAKE% --build .
-@)
+)
 
 @if "%1" neq "-nopause" (
 	@pause
-@)
+)
